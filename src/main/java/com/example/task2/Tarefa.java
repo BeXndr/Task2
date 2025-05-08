@@ -1,5 +1,9 @@
 package com.example.task2;
 
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
+
 public class Tarefa {
      
     private int id;
@@ -69,5 +73,156 @@ public class Tarefa {
         this.situacao = situacao;
     }
 
+    public boolean salvar(Tarefa tarefa) {
+        try {
+            Statement stm = ConexaoBD.getInstance().getConnection().createStatement();
+            
+            String sql = " insert into tarefa values (default, " 
+                    +" '" + tarefa.getDescricao() + "', " 
+                    +" '" + tarefa.getData_criacao() + "', " 
+                    +" '" + tarefa.getData_prevista() + "', " 
+                    +" '" + tarefa.getData_encerramento() + "', " 
+                    +" '" + tarefa.getSituacao() + "'); ";
+            
+            int resultado = stm.executeUpdate(sql);
+            
+            System.out.println("SQL: " + sql);
+            System.out.println("Resultado: " + resultado);
+            return true;
+        } catch (Exception e) {
+            System.out.println("Erro ao salvar dado!" + e);
+            return false;
+        }
+    }
     
+    public boolean deletarTarefa(int id) {
+        try {
+            Statement stm = ConexaoBD.getInstance().getConnection().createStatement();
+
+            String sql = "DELETE FROM tarefa WHERE id = " + id;
+
+            int resultado = stm.executeUpdate(sql);
+
+            System.out.println("SQL: " + sql);
+            System.out.println("Resultado: " + resultado);
+
+            return true;
+        } catch (Exception e) {
+            System.out.println("Erro ao excluir tarefa!" + e);
+            return false;
+        }
+    }
+    
+    public ArrayList<Tarefa> consultar() {
+        ArrayList<Tarefa> tarefa = new ArrayList<>();
+        Tarefa retorno;
+
+        try {
+            Statement st = ConexaoBD.getInstance().getConnection().createStatement();
+
+            String sql = " select * from tarefa; ";
+
+            System.out.println("SQL: " + sql);
+
+            ResultSet resultado = st.executeQuery(sql);
+
+            while (resultado.next()) {
+                retorno = new Tarefa();
+                retorno.setId(resultado.getInt("id"));
+                retorno.setDescricao(resultado.getString("descricao"));
+                retorno.setData_criacao(resultado.getString("data_criacao"));
+                retorno.setData_prevista(resultado.getString("data_prevista"));
+                retorno.setData_encerramento(resultado.getString("data_encerramento"));
+                retorno.setSituacao(resultado.getString("situacao"));
+
+                tarefa.add(retorno);
+            }
+
+        } catch (Exception e) {
+            System.out.println("Erro ao consultar tarefas: " + e);
+        }
+
+        return tarefa;
+    }
+    
+    public ArrayList<Tarefa> consultarPorData(String dataMin, String dataMax) {
+        ArrayList<Tarefa> tarefa = new ArrayList<>();
+        Tarefa retorno;
+
+        try {
+            Statement st = ConexaoBD.getInstance().getConnection().createStatement();
+
+            String sql = " select* from tarefa where data_criacao >= '" + dataMin + "' and data_criacao <= '" + dataMax + "'; ";
+
+            System.out.println("SQL: " + sql);
+
+            ResultSet resultado = st.executeQuery(sql);
+
+            while (resultado.next()) {
+                retorno = new Tarefa();
+                retorno.setId(resultado.getInt("id"));
+                retorno.setDescricao(resultado.getString("descricao"));
+                retorno.setData_criacao(resultado.getString("data_criacao"));
+                retorno.setData_prevista(resultado.getString("data_prevista"));
+                retorno.setData_encerramento(resultado.getString("data_encerramento"));
+                retorno.setSituacao(resultado.getString("situacao"));
+
+                tarefa.add(retorno);
+            }
+
+        } catch (Exception e) {
+            System.out.println("Erro ao consultar tarefas: " + e);
+        }
+
+        return tarefa;
+    }
+    
+    public Tarefa consultarUltima() {
+        Tarefa tarefa = new Tarefa();
+        Tarefa retorno;
+
+        try {
+            Statement st = ConexaoBD.getInstance().getConnection().createStatement();
+
+            String sql = " select id from tarefa where id=(select max(id) from tarefa); ";
+
+            System.out.println("SQL: " + sql);
+
+            ResultSet resultado = st.executeQuery(sql);
+
+            while (resultado.next()) {
+                retorno = new Tarefa();
+                retorno.setId(resultado.getInt("id"));
+            }
+
+        } catch (Exception e) {
+            System.out.println("Erro ao consultar tarefas: " + e);
+        }
+
+        return tarefa;
+    }
+    
+    public Tarefa consultarPorId(int id) {
+        Tarefa tarefa = null;
+
+        try {
+            Statement st = ConexaoBD.getInstance().getConnection().createStatement();
+
+            String sql = " select* from tarefa where id = 4 " + id + "; ";
+
+            System.out.println("SQL: " + sql);
+
+            ResultSet resultado = st.executeQuery(sql);
+
+            while (resultado.next()) {
+                tarefa = new Tarefa();
+                tarefa.setId(resultado.getInt("id"));
+            }
+
+        } catch (Exception e) {
+            System.out.println("Erro ao consultar tarefas: " + e);
+        }
+
+        return tarefa;
+    }
 }
